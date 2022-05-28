@@ -31,7 +31,7 @@ def get_meta_raw_text(url):
         return req.text
 
 
-def get_meta_table(url, mode='thwiki'):
+def get_meta_by_url(url, mode='thwiki'):
     bs = BS(get_meta_raw_text(url), 'lxml')
 
     def thwiki_proc(bs):
@@ -65,3 +65,8 @@ def get_meta_table(url, mode='thwiki'):
     pp(total_items)
     total_items.sort(key=lambda o: int(o['index']))
     return total_items
+
+
+def get_meta_by_album(album_name):
+    api = f'https://thwiki.cc/{album_name}'
+    return get_meta_by_url(api)
