@@ -1,5 +1,4 @@
 from pathlib import Path
-from os import rename
 
 
 def check_album_fn_formated(album_dir):
@@ -33,4 +32,4 @@ def rename_by_meta(meta, album_dir, album_fns=None):
 
     for i, f in enumerate(origin_fs):
         print(f'{f.name} => {des_fs[i].name}')
-        rename(f, des_fs[i])
+        f.rename(des_fs[i])
