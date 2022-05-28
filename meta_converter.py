@@ -2,7 +2,19 @@ from pathlib import Path
 from os import rename
 
 
+def check_album_fn_formated(album_dir):
+    album_dir = Path(album_dir)
+    origin = list(album_dir.glob('*.flac'))
+    test_r = [f for f in origin
+              if 'track' in f.name.lower()
+              ]
+    return len(test_r) != len(origin)
+
+
 def rename_by_meta(meta, album_dir, album_fns=None):
+    if check_album_fn_formated(album_dir):
+        print(f'Maybe filenames in {album_dir} already formated, skip')
+        return
     # TODO: rename filename format config
     des_fns = [
         f'{m["index"]}_{m["title"]}'
