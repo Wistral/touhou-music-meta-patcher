@@ -2,7 +2,7 @@ from pathlib import Path
 from mutagen.flac import Picture
 from mutagen import File
 
-from cd_meta_mgr import get_meta_by_album, turn_to_flac_meta
+from cd_meta_mgr import get_cover_by_album, get_meta_by_album, turn_to_flac_meta
 
 
 def check_album_fn_formated(album_dir):
@@ -79,7 +79,7 @@ def set_music_cover_data(music_fp, image_data):
     song.save()
 
 
-def set_album_cover(album_dir, image_fp):
+def set_album_cover_local(album_dir, image_fp):
     image_fp = Path(image_fp)
     album_dir = Path(album_dir)
     assert image_fp.exists()
@@ -89,6 +89,15 @@ def set_album_cover(album_dir, image_fp):
     for song in album_dir.glob('*.flac'):
         set_music_cover_data(song, data)
         print(f'Set {song}.cover={image_fp}')
+
+
+def set_album_cover_auto(album_dir):
+    album_dir = Path(album_dir)
+    assert album_dir.exists()
+    data = get_cover_by_album(album_dir.name)
+    for song in album_dir.glob('*.flac'):
+        set_music_cover_data(song, data)
+        print(f'Set {song}.cover')
 
 
 def remove_album_cover(album_dir):

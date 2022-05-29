@@ -16,7 +16,25 @@ def str2hex(ss):
     return md5(ss).hexdigest()
 
 
-def get_meta_raw_text(url):
+def get_url_raw_content(url):
+    if not cache_dir.exists():
+        mkdir(cache_dir)
+    h = str2hex(url)
+    cache_fn = cache_dir / f'{h}.dat'
+    if cache_fn.exists():
+        print(f'Use cache {cache_fn}')
+        with open(cache_fn, 'rb') as f:
+            return f.read()
+    else:
+        req = get(url, headers={'User-Agent': ua})
+        assert req.status_code == 200
+        print(f'[OK] GET {url}')
+        with open(cache_fn, 'wb') as f:
+            f.write(req.content)
+        return req.content
+
+
+def get_meta_raw_text_by_url(url):
     if not cache_dir.exists():
         mkdir(cache_dir)
     h = str2hex(url)
@@ -32,8 +50,14 @@ def get_meta_raw_text(url):
         return req.text
 
 
+def get_meta_raw_text_by_album(album_name):
+    quoted = quote(album_name.replace(" ", "_"))
+    api = f'https://thwiki.cc/{quoted}'
+    return BS(get_meta_raw_text_by_url(api), 'lxml')
+
+
 def get_meta_by_url(url, mode='thwiki'):
-    bs = BS(get_meta_raw_text(url), 'lxml')
+    bs = BS(get_meta_raw_text_by_url(url), 'lxml')
 
     def thwiki_proc(bs):
         return bs.html.body.find_all(attrs={'class': 'wikitable musicTable'})[0].tbody
@@ -80,3 +104,11 @@ def turn_to_flac_meta(meta, album_name):
         'album': album_name, 'title': meta['title'], 'artist': artists
     }
     return flac_meta
+
+
+def get_cover_by_album(album_name):
+    fn = f'{album_name}封面.jpg'
+    api = f'https://thwiki.cc/文件:{fn.replace(" ","_")}'
+    html = BS(get_meta_raw_text_by_url(api), 'lxml')
+    href = html.find_all(attrs={'title': fn})[0].attrs['href']
+    return get_url_raw_content(href)
