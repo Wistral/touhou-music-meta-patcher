@@ -1,7 +1,7 @@
 from pathlib import Path
 from mutagen.flac import FLAC
 
-from cd_meta_mgr import get_meta_by_album
+from cd_meta_mgr import get_meta_by_album, turn_to_flac_meta
 
 
 def check_album_fn_formated(album_dir):
@@ -59,8 +59,4 @@ def modify_fn_meta_by_album(album_dir, album_name):
     songs = [f for f in ad.glob('*.flac')]
     songs.sort(key=lambda sf: sf.name)
     for i, meta in enumerate(m):
-        artists = [meta.get(x) for x in ('编曲', '作曲', '演唱') if meta.get(x)]
-        flac_meta = {
-            'album': album_name, 'title': meta['title'], 'artist': artists
-        }
-        modify_fn_meta_by_meta(songs[i], flac_meta)
+        modify_fn_meta_by_meta(songs[i], turn_to_flac_meta(meta, album_name))

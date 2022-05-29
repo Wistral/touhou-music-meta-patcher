@@ -71,3 +71,12 @@ def get_meta_by_url(url, mode='thwiki'):
 def get_meta_by_album(album_name):
     api = f'https://thwiki.cc/{quote(album_name)}'
     return get_meta_by_url(api)
+
+
+def turn_to_flac_meta(meta, album_name):
+    '''format meta to use in flac tagging'''
+    artists = [meta.get(x) for x in ('编曲', '作曲', '演唱') if meta.get(x)]
+    flac_meta = {
+        'album': album_name, 'title': meta['title'], 'artist': artists
+    }
+    return flac_meta
