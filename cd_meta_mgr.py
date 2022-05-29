@@ -87,7 +87,6 @@ def get_meta_by_url(url, mode='thwiki'):
     if item:
         total_items.append(item)
 
-    pp(total_items)
     total_items.sort(key=lambda o: int(o['index']))
     return total_items
 

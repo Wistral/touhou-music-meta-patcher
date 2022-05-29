@@ -91,10 +91,12 @@ def set_album_cover_local(album_dir, image_fp):
         print(f'Set {song}.cover={image_fp}')
 
 
-def set_album_cover_auto(album_dir):
+def set_album_cover_auto(album_dir, album_name=''):
     album_dir = Path(album_dir)
     assert album_dir.exists()
-    data = get_cover_by_album(album_dir.name)
+    if not album_name:
+        album_name = album_dir.name
+    data = get_cover_by_album(album_name)
     for song in album_dir.glob('*.flac'):
         set_music_cover_data(song, data)
         print(f'Set {song}.cover')
@@ -108,3 +110,14 @@ def remove_album_cover(album_dir):
         song.clear_pictures()
         song.save()
         print(f'remove {f}.cover')
+
+
+def auto_update_album_dir(album_dir, album_name=''):
+    '''some album may contain illegal characters that cannot be filepath, so need to pass in override album name'''
+    album_dir = Path(album_dir)
+    assert album_dir.exists()
+    if not album_name:
+        album_name = album_dir.name
+
+    modify_fn_meta_by_album(album_dir, album_name)
+    set_album_cover_auto(album_dir, album_name)
