@@ -89,3 +89,13 @@ def set_album_cover(album_dir, image_fp):
     for song in album_dir.glob('*.flac'):
         set_music_cover_data(song, data)
         print(f'Set {song}.cover={image_fp}')
+
+
+def remove_album_cover(album_dir):
+    album_dir = Path(album_dir)
+    assert album_dir.exists()
+    for f in album_dir.glob('*.flac'):
+        song = File(f)
+        song.clear_pictures()
+        song.save()
+        print(f'remove {f}.cover')
