@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from requests import get
 from bs4 import BeautifulSoup as BS
 from pathlib import Path
@@ -68,5 +69,5 @@ def get_meta_by_url(url, mode='thwiki'):
 
 
 def get_meta_by_album(album_name):
-    api = f'https://thwiki.cc/{album_name}'
+    api = f'https://thwiki.cc/{quote(album_name)}'
     return get_meta_by_url(api)
