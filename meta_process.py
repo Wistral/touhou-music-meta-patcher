@@ -1,5 +1,6 @@
 from pathlib import Path
-from mutagen.flac import FLAC
+from mutagen.flac import Picture
+from mutagen import File
 
 from cd_meta_mgr import get_meta_by_album, turn_to_flac_meta
 
@@ -44,7 +45,7 @@ def check_flac_meta(meta):
 
 
 def modify_fn_meta_by_meta(fn, meta):
-    song = FLAC(fn)
+    song = File(fn)
     check_flac_meta(meta)
     print(f'Add info {meta} for {fn}')
     song.update(meta)
@@ -60,3 +61,31 @@ def modify_fn_meta_by_album(album_dir, album_name):
     songs.sort(key=lambda sf: sf.name)
     for i, meta in enumerate(m):
         modify_fn_meta_by_meta(songs[i], turn_to_flac_meta(meta, album_name))
+
+
+def set_music_cover_data(music_fp, image_data):
+    music_fp = Path(music_fp)
+    assert Path(music_fp).exists()
+    song = File(music_fp)
+    if song.pictures:
+        print(f'Maybe already has cover, skip')
+        return
+    im = Picture()
+    im.type = 3
+    im.meme = 'image/jpeg'
+    im.desc = 'front cover'
+    im.data = image_data
+    song.add_picture(im)
+    song.save()
+
+
+def set_album_cover(album_dir, image_fp):
+    image_fp = Path(image_fp)
+    album_dir = Path(album_dir)
+    assert image_fp.exists()
+    assert album_dir.exists()
+    with open(image_fp, 'rb') as f:
+        data = f.read()
+    for song in album_dir.glob('*.flac'):
+        set_music_cover_data(song, data)
+        print(f'Set {song}.cover={image_fp}')
